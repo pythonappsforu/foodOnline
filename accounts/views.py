@@ -6,6 +6,7 @@ from django.shortcuts import render,redirect
 from django.utils.http import urlsafe_base64_decode
 
 from vendor.forms import VendorForm
+from vendor.models import Vendor
 from .models import User, UserProfile
 from accounts.forms import UserForm
 from django.contrib import messages, auth
@@ -29,7 +30,7 @@ def check_role_customer(user):
 def registerUser(request):
     if request.user.is_authenticated:
         messages.warning(request,'you are already logged in')
-        return redirect('dashboard')
+        return redirect('myAccount')
     elif request.method == 'POST':
         form = UserForm(request.POST)
         if form.is_valid():
@@ -54,7 +55,10 @@ def registerUser(request):
             user.save()
 
             #send verification email
-            send_verification_email(request,user)
+            mail_subject = 'Please activate your account'
+            email_template = 'accounts/emails/account_verification_email.html'
+            send_verification_email(request, user, mail_subject,
+                                    email_template)
 
             messages.success(request,'Your account has been registered sucessfully!')
             return redirect('registerUser')
@@ -72,7 +76,7 @@ def registerUser(request):
 def registerVendor(request):
     if request.user.is_authenticated:
         messages.warning(request,'you are already logged in')
-        return redirect('dashboard')
+        return redirect('myAccount')
     elif request.method == 'POST':
         form = UserForm(request.POST)
         vendor_form = VendorForm(request.POST,request.FILES)
@@ -179,7 +183,11 @@ def custDashboard(request):
 @login_required(login_url='login')
 @user_passes_test(check_role_vendor)
 def vendorDashboard(request):
-    return render(request,'accounts/vendorDashboard.html')
+    vendor = Vendor.objects.get(user=request.user)
+    context = {
+        'vendor':vendor,
+    }
+    return render(request,'accounts/vendorDashboard.html',context)
 
 
 def forgot_password(request):
