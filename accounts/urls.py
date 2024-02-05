@@ -20,6 +20,7 @@ urlpatterns = [
     path('reset_password/', views.reset_password,name='reset_password'),
 
     # vendor url routing
-    path('vendor/', include('vendor.urls'))
+    path('vendor/', include('vendor.urls')),
+    path('customer/', include('customers.urls')),
 
 ]
