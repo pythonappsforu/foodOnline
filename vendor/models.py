@@ -60,8 +60,7 @@ class Vendor(models.Model):
                 else:
                     # Send notification email
                     mail_subject = "We're sorry! You are not eligible for publishing your food menu on our marketplace."
-                    send_notification_mail(mail_subject, mail_template,
-                                           context)
+                    send_notification_mail(mail_subject, mail_template,context)
 
         return super(Vendor, self).save(*args,**kwargs)
 
