@@ -9,7 +9,7 @@ from .forms import OrderForm
 from .models import Order, Payment, OrderedFood
 import simplejson as json
 
-from .utils import generate_order_number
+from .utils import generate_order_number, order_total_by_vendor
 from accounts.utils import send_notification_mail
 
 import razorpay
@@ -191,14 +191,14 @@ def payments(request):
                     'order': order,
                     'to_email': i.fooditem.vendor.user.email,
                     'ordered_food_to_vendor': ordered_food_to_vendor,
-                    # 'vendor_subtotal': order_total_by_vendor(order, i.fooditem.vendor.id)['subtotal'],
-                    # 'tax_data':order_total_by_vendor(order, i.fooditem.vendor.id)['tax_dict'],
-                    # 'vendor_grand_total':order_total_by_vendor(order, i.fooditem.vendor.id)['grand_total'],
+                    'vendor_subtotal': order_total_by_vendor(order, i.fooditem.vendor.id)['subtotal'],
+                    'tax_data':order_total_by_vendor(order, i.fooditem.vendor.id)['tax_dict'],
+                    'vendor_grand_total':order_total_by_vendor(order, i.fooditem.vendor.id)['grand_total'],
                 }
                 send_notification_mail(mail_subject, mail_template, context)
 
         # CLEAR THE CART IF THE PAYMENT IS SUCCESS
-        # cart_items.delete()
+        cart_items.delete()
 
         # RETURN BACK TO AJAX WITH THE STATUS SUCCESS OR FAILURE
         response = {
